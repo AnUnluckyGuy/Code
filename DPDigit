@@ -1,0 +1,66 @@
+#include <bits/stdc++.h>
+#define ll          long long
+ 
+ 
+using namespace std;
+typedef pair<int, int> pii;
+typedef unsigned long long ull;
+ 
+ll n, sum;
+ull f[20][2][170], p[20];
+int vis[20][2][170];
+string s;
+ 
+ull get(int pos, bool up, int cur)
+{
+    if(vis[pos][up][cur] != -1) return f[pos][up][cur];
+    vis[pos][up][cur] = 1;
+ 
+    if(pos >= s.size())
+    {
+        if(cur <= sum) return f[pos][up][cur] = 0;
+        return f[pos][up][cur] = ULLONG_MAX;
+    }
+ 
+    int lim = up? 0 : s[pos] - '0';
+    ull &res = f[pos][up][cur];
+    res = ULLONG_MAX;
+    for(int i = lim; i <= 9; ++i)
+    {
+        ull tmp = get(pos + 1, up || i > lim, cur + i);
+        if(tmp == ULLONG_MAX) continue;
+        res = min(res, (ull)i * p[(int)s.size() - pos - 1] + tmp);
+    }
+    return res;
+}
+ 
+string get_string(ll num)
+{
+    string t="";
+    while(num)
+    {
+        int d=num%10;
+        t = char(d+'0')+t;
+        num/=10;
+    }
+    return t;
+}
+ 
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+ 
+    int t;
+    cin >> t;
+    p[0] = 1;
+    for(int i = 1; i <= 19; ++i) p[i] = p[i - 1] * 10;
+    ull res, ans;
+    while(t --)
+    {
+        cin >> n >> sum;
+        memset(&vis, -1, sizeof vis);
+        s = '0' + get_string(n);
+        res = get(0, 0, 0);
+        cout << res - n << '\n';
+    }
+}
